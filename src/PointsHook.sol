@@ -47,6 +47,8 @@ contract PointsHook is BaseHook, ERC1155 {
         return "https://api.example.com/token/{id}";
     }
 
+    mapping(address => uint256) public userTotalVolume;
+
     function _afterSwap(
         address,
         PoolKey calldata key,
@@ -58,8 +60,29 @@ contract PointsHook is BaseHook, ERC1155 {
         if (!swapParams.zeroForOne) return (this.afterSwap.selector, 0);
 
         uint256 ethSpendAmount = uint256(int256(-delta.amount0()));
-        uint256 pointsForSwap = ethSpendAmount / 5;
+
+        // feature - reward tier
+        address user = abi.decode(hookData, address);
+        if (user == address(0)) return (this.afterSwap.selector, 0);
+        uint256 currentTotalVolume = userTotalVolume[user];
+
+        uint256 pointsForSwap;
+
+        if (currentTotalVolume > 10 ether) {
+            //Tier 1: 20% rate
+            pointsForSwap = ethSpendAmount / 5;
+        }
+        else if (currentTotalVolume > 5 ether) {
+            //Tier 2: 10% rate
+            pointsForSwap = ethSpendAmount / 10;
+        }
+        else {
+            //Tier 3: 5% rate
+            pointsForSwap = ethSpendAmount / 20;
+        }
+
         _assignPoints(key.toId(), hookData, pointsForSwap);
+        userTotalVolume[user] = currentTotalVolume + ethSpendAmount;
 
         return (this.afterSwap.selector, 0);
     }

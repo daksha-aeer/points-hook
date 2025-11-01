@@ -54,7 +54,7 @@ contract PointsHook is BaseHook, ERC1155 {
         uint256 ethSpendAmount = uint256(int256(-delta.amount0()));
 
         // feature - reward tier
-        address user = abi.decode(hookData, address);
+        address user = abi.decode(hookData, (address));
         if (user == address(0)) return (this.afterSwap.selector, 0);
         uint256 currentTotalVolume = userTotalVolume[user];
 

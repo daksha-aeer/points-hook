@@ -69,10 +69,10 @@ contract PointsHook is BaseHook, ERC1155 {
         bytes calldata hookData,
         uint256 points
     ) internal {
-        # if no hookdata passed, no points assigned
+        // if no hookdata passed, no points assigned
         if (hookData.length == 0) return;
 
-        # extracting user address from hookData
+        // extracting user address from hookData
         address user = abi.decode(hookData, (address));
 
         if (user == address(0)) return;

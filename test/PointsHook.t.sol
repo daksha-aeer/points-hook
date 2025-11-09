@@ -56,7 +56,7 @@ contract TestPointsHook is Test, Deployers, ERC1155TokenReceiver {
         token.approve(address(modifyLiquidityRouter), type(uint256).max);
 
         // Initialize a pool
-        (key, ) = initPool(
+        (key,) = initPool(
             ethCurrency, // Currency 0 = ETH
             tokenCurrency, // Currency 1 = TOKEN
             hook, // Hook Contract
@@ -69,24 +69,16 @@ contract TestPointsHook is Test, Deployers, ERC1155TokenReceiver {
         uint160 sqrtPriceAtTickUpper = TickMath.getSqrtPriceAtTick(60);
 
         uint256 ethToAdd = 100 ether;
-        uint128 liquidityDelta = LiquidityAmounts.getLiquidityForAmount0(
-            SQRT_PRICE_1_1,
-            sqrtPriceAtTickUpper,
-            ethToAdd
-        );
-        uint256 tokenToAdd = LiquidityAmounts.getAmount1ForLiquidity(
-            sqrtPriceAtTickLower,
-            SQRT_PRICE_1_1,
-            liquidityDelta
-        );
+        uint128 liquidityDelta = LiquidityAmounts.getLiquidityForAmount0(SQRT_PRICE_1_1, sqrtPriceAtTickUpper, ethToAdd);
+        uint256 tokenToAdd =
+            LiquidityAmounts.getAmount1ForLiquidity(sqrtPriceAtTickLower, SQRT_PRICE_1_1, liquidityDelta);
 
-        modifyLiquidityRouter.modifyLiquidity{value: ethToAdd}(
+        modifyLiquidityRouter.modifyLiquidity{
+            value: ethToAdd
+        }(
             key,
             ModifyLiquidityParams({
-                tickLower: -60,
-                tickUpper: 60,
-                liquidityDelta: int256(uint256(liquidityDelta)),
-                salt: bytes32(0)
+                tickLower: -60, tickUpper: 60, liquidityDelta: int256(uint256(liquidityDelta)), salt: bytes32(0)
             }),
             ZERO_BYTES
         );
@@ -94,10 +86,7 @@ contract TestPointsHook is Test, Deployers, ERC1155TokenReceiver {
 
     function test_swap() public {
         uint256 poolIdUint = uint256(PoolId.unwrap(key.toId()));
-        uint256 pointsBalanceOriginal = hook.balanceOf(
-            address(this),
-            poolIdUint
-        );
+        uint256 pointsBalanceOriginal = hook.balanceOf(address(this), poolIdUint);
 
         // Set user address in hook data
         bytes memory hookData = abi.encode(address(this));
@@ -108,94 +97,68 @@ contract TestPointsHook is Test, Deployers, ERC1155TokenReceiver {
         // fourth swap - 1 ether (20% tier, balance = 12)
 
         // first swap for 1 ether
-        swapRouter.swap{value: 1 ether}(
+        swapRouter.swap{
+            value: 1 ether
+        }(
             key,
             SwapParams({
                 zeroForOne: true,
                 amountSpecified: -1 ether, // Exact input for output swap
                 sqrtPriceLimitX96: TickMath.MIN_SQRT_PRICE + 1
             }),
-            PoolSwapTest.TestSettings({
-                takeClaims: false,
-                settleUsingBurn: false
-            }),
+            PoolSwapTest.TestSettings({takeClaims: false, settleUsingBurn: false}),
             hookData
         );
-        
 
-        uint256 pointsBalanceAfterSwap1 = hook.balanceOf(
-            address(this),
-            poolIdUint
-        );
+        uint256 pointsBalanceAfterSwap1 = hook.balanceOf(address(this), poolIdUint);
         assertEq(pointsBalanceAfterSwap1 - pointsBalanceOriginal, 5 * 10 ** 16);
 
-
-
-
         // second swap for 5 ether
-        swapRouter.swap{value: 5 ether}(
+        swapRouter.swap{
+            value: 5 ether
+        }(
             key,
             SwapParams({
                 zeroForOne: true,
                 amountSpecified: -5 ether, // Exact input for output swap
                 sqrtPriceLimitX96: TickMath.MIN_SQRT_PRICE + 1
             }),
-            PoolSwapTest.TestSettings({
-                takeClaims: false,
-                settleUsingBurn: false
-            }),
+            PoolSwapTest.TestSettings({takeClaims: false, settleUsingBurn: false}),
             hookData
         );
-        uint256 pointsBalanceAfterSwap2 = hook.balanceOf(
-            address(this),
-            poolIdUint
-        );
+        uint256 pointsBalanceAfterSwap2 = hook.balanceOf(address(this), poolIdUint);
         assertEq(pointsBalanceAfterSwap2 - pointsBalanceAfterSwap1, 25 * 10 ** 16);
 
-
-
-
         // third swap for 6 ether
-        swapRouter.swap{value: 6 ether}(
+        swapRouter.swap{
+            value: 6 ether
+        }(
             key,
             SwapParams({
                 zeroForOne: true,
                 amountSpecified: -6 ether, // Exact input for output swap
                 sqrtPriceLimitX96: TickMath.MIN_SQRT_PRICE + 1
             }),
-            PoolSwapTest.TestSettings({
-                takeClaims: false,
-                settleUsingBurn: false
-            }),
+            PoolSwapTest.TestSettings({takeClaims: false, settleUsingBurn: false}),
             hookData
         );
-        uint256 pointsBalanceAfterSwap3 = hook.balanceOf(
-            address(this),
-            poolIdUint
-        );
+        uint256 pointsBalanceAfterSwap3 = hook.balanceOf(address(this), poolIdUint);
         assertEq(pointsBalanceAfterSwap3 - pointsBalanceAfterSwap2, 6 * 10 ** 17);
 
-
-
-
         // fourth swap for 1 ether
-        swapRouter.swap{value: 1 ether}(
+        swapRouter.swap{
+            value: 1 ether
+        }(
             key,
             SwapParams({
                 zeroForOne: true,
                 amountSpecified: -1 ether, // Exact input for output swap
                 sqrtPriceLimitX96: TickMath.MIN_SQRT_PRICE + 1
             }),
-            PoolSwapTest.TestSettings({
-                takeClaims: false,
-                settleUsingBurn: false
-            }),
+            PoolSwapTest.TestSettings({takeClaims: false, settleUsingBurn: false}),
             hookData
         );
-        uint256 pointsBalanceAfterSwap4 = hook.balanceOf(
-            address(this),
-            poolIdUint
-        );
+        uint256 pointsBalanceAfterSwap4 = hook.balanceOf(address(this), poolIdUint);
         assertEq(pointsBalanceAfterSwap4 - pointsBalanceAfterSwap3, 2 * 10 ** 17);
     }
 }

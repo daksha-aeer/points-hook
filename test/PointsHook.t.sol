@@ -68,7 +68,7 @@ contract TestPointsHook is Test, Deployers, ERC1155TokenReceiver {
         uint160 sqrtPriceAtTickLower = TickMath.getSqrtPriceAtTick(-60);
         uint160 sqrtPriceAtTickUpper = TickMath.getSqrtPriceAtTick(60);
 
-        uint256 ethToAdd = 0.1 ether;
+        uint256 ethToAdd = 100 ether;
         uint128 liquidityDelta = LiquidityAmounts.getLiquidityForAmount0(
             SQRT_PRICE_1_1,
             sqrtPriceAtTickUpper,
@@ -107,12 +107,12 @@ contract TestPointsHook is Test, Deployers, ERC1155TokenReceiver {
         // third swap - 6 ether (10% tier, balance = 6)
         // fourth swap - 1 ether (20% tier, balance = 12)
 
-        // first swap for 0.1 ether
-        swapRouter.swap{value: 0.1 ether}(
+        // first swap for 1 ether
+        swapRouter.swap{value: 1 ether}(
             key,
             SwapParams({
                 zeroForOne: true,
-                amountSpecified: -0.1 ether, // Exact input for output swap
+                amountSpecified: -1 ether, // Exact input for output swap
                 sqrtPriceLimitX96: TickMath.MIN_SQRT_PRICE + 1
             }),
             PoolSwapTest.TestSettings({
@@ -127,7 +127,7 @@ contract TestPointsHook is Test, Deployers, ERC1155TokenReceiver {
             address(this),
             poolIdUint
         );
-        assertEq(pointsBalanceAfterSwap1 - pointsBalanceOriginal, 5 * 10 ** 15);
+        assertEq(pointsBalanceAfterSwap1 - pointsBalanceOriginal, 5 * 10 ** 16);
 
 
 

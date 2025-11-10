@@ -10,6 +10,8 @@ import {HookMiner} from "v4-periphery/src/utils/HookMiner.sol";
 
 contract PointsHookScript is Script {
     address internal constant CREATE2_DEPLOYER = 0x4e59b44847b379578588920cA78FbF26c0B4956C;
+    
+    // base sepolia
     address internal constant POOL_MANAGER = 0x05E73354cFDd6745C338b50BcFDfA3Aa6fA03408;
 
     function run() external {
